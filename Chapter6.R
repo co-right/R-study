@@ -87,12 +87,95 @@ mpg %>%
 
 # 집단별로 요약하기
 
+exam %>% summarise(mean_math=mean(math))
 
+exam %>% 
+  group_by(class) %>% 
+  summarise(mean_math = mean(math))
 
+exam %>% 
+  group_by(class) %>% 
+  summarise(mean_math = mean(math),
+            sum_math = sum(math),
+            median_math = median(math),
+            n=n())
 
+mpg %>% 
+  group_by(manufacturer, drv) %>% 
+  summarise(mean_cty = mean(cty)) %>% 
+  head(10)
 
+# dplyr 조합하기
+mpg %>% group_by(manufacturer) %>% 
+  filter(class == "suv") %>% 
+  mutate(tot = (cty+hwy)/2) %>% 
+  summarise(mean_tot = mean(tot)) %>% 
+  arrange(desc(mean_tot)) %>% 
+  head(5)
 
+#혼자서 해보기
+mpg %>% group_by(class) %>% 
+  summarise(mean_cty = mean(cty))
 
+mpg %>% group_by(class) %>% 
+  summarise(mean_cty = mean(cty)) %>% 
+  arrange(desc(mean_cty))
 
+mpg %>% group_by(class) %>% 
+  summarise(mean_hwy = mean(hwy)) %>% 
+  arrange(desc(mean_hwy)) %>% 
+  head(3)
 
+str(mpg)
 
+mpg %>% group_by(manufacturer) %>% 
+  filter(class=="compact") %>% 
+  summarise(n=n())
+
+#데이터 합치기
+#가로로 합치기
+test1 <- data.frame(id=c(1,2,3,4,5),
+                    midterm = c(60,80,70,90,85))
+test2 <- data.frame(id=c(1,2,3,4,5),
+                    final = c(70,83,65,95,80))
+test1
+test2
+
+total <- left_join(test1, test2, by = "id")
+total
+name<-data.frame(class = c(1,2,3,4,5),
+                 teacher = c("kim","lee","park","choi","jung"))
+name
+exam_new <- left_join(exam, name, by = "class")
+exam_new
+group_a <- data.frame(id = c(1,2,3,4,5), test = c(60,80,70,90,85))
+group_b <- data.frame(id = c(6,7,8,9,10), test = c(70,83,65,95,80))
+group_a
+group_b
+group_all <- bind_rows(group_a, group_b)
+group_all
+fuel <- data.frame(fl = c("c","d","e","p","r"),
+                   price_fl = c(2.35, 2.38, 2.11,2.76, 2.22))
+fuel
+mpg_copy2 <- mpg
+mpg_copy2 %>% head(10)
+mpg_copy3<-left_join(mpg_copy2, fuel, by = "fl")
+mpg_copy3 %>% head(10)
+mpg_copy3 %>% select(model, fl, price_fl) %>% head(10)
+
+#분석 도전
+library(ggplot2)
+midwest
+midwest %>% head(10)
+midwest <- as.data.frame(ggplot2::midwest)
+midwest
+midwest<-midwest %>% mutate(ratio_child=(poptotal-popadults)/poptotal*100)
+
+midwest %>% arrange(desc(ratio_child)) %>% select(county, ratio_child) %>% head(5)
+
+midwest<-midwest %>% mutate(grade=ifelse(ratio_child>=40,"large", ifelse(ratio_child>=30, "middle","small")))
+table(midwest$grade)
+
+midwest<-midwest %>% mutate(asian_ratio=popasian/poptotal*100)
+midwest %>% select(asian_ratio)
+midwest %>% arrange(asian_ratio) %>% select(state, county, asian_ratio) %>% head(10)
